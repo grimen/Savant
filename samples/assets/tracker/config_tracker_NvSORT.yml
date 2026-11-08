@@ -23,6 +23,7 @@
 
 BaseConfig:
   minDetectorConfidence: 0.1345    # If the confidence of a detector bbox is lower than this, then it won't be considered for tracking
+  checkClassMatch: 1    # DeepStream 9.1 reads this from BaseConfig.
 
 TargetManagement:
   enableBboxUnClipping: 0    # In case the bbox is likely to be clipped by image border, unclip bbox
@@ -41,7 +42,6 @@ TrajectoryManagement:
 DataAssociator:
   dataAssociatorType: 0    # the type of data associator among { DEFAULT= 0 }
   associationMatcherType: 1    # the type of matching algorithm among { GREEDY=0, CASCADED=1 }
-  checkClassMatch: 1    # If checked, only the same-class objects are associated with each other. Default: true
 
   # [Association Metric: Thresholds for valid candidates]
   minMatchingScore4Overall: 0.2543    # Min total score
