@@ -55,7 +55,7 @@ def alpha_comp(
     frame: cv2.cuda.GpuMat,
     overlay: Union[cv2.cuda.GpuMat, np.ndarray],
     start: Tuple[int, int],
-    alpha_op=cv2.cuda.ALPHA_OVER,
+    alpha_op=None,
     stream: Optional[cv2.cuda.Stream] = None,
 ):
     """In place composition of two images using alpha opacity values contained in
@@ -77,6 +77,8 @@ def alpha_comp(
     :param stream: CUDA stream.
     """
 
+    if alpha_op is None:
+        alpha_op = cv2.cuda.ALPHA_OVER
     if isinstance(overlay, np.ndarray):
         overlay = cv2.cuda.GpuMat(overlay)
     roi_mat = cv2.cuda.GpuMat(frame, start + overlay.size())

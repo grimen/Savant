@@ -60,8 +60,17 @@ class ObjectsPreprocessing:
     def __init__(self, batch_size: int):
         self._preprocessing_functions = {}
         self._frames_map = {}
-        self._stream_pool = [cv2.cuda.Stream() for _ in range(batch_size)]
+        self._batch_size = batch_size
+        # CUDA streams need Savant's CUDA OpenCV. DeepStream 9.1 does not
+        # publish that package, and a detector without object-image
+        # preprocessing never uses the pool.
+        self._stream_pool = None
         self.logger = get_logger(__name__)
+
+    def _streams(self):
+        if self._stream_pool is None:
+            self._stream_pool = [cv2.cuda.Stream() for _ in range(self._batch_size)]
+        return self._stream_pool
 
     def add_preprocessing_function(
         self,
@@ -106,7 +115,7 @@ class ObjectsPreprocessing:
             left = 0
             top = 0
             row_height = 0
-            cuda_stream = self._stream_pool[nvds_frame_meta.batch_id]
+            cuda_stream = self._streams()[nvds_frame_meta.batch_id]
             with nvds_to_gpu_mat(buffer, nvds_frame_meta) as frame_mat:
                 frame_image = GPUImage(image=frame_mat, cuda_stream=cuda_stream)
                 copy_frame_image = GPUImage(
@@ -174,7 +183,7 @@ class ObjectsPreprocessing:
                     nvds_obj_meta.rect_params.height = preprocess_image.height
                     left += preprocess_image.width
 
-        for stream in self._stream_pool:
+        for stream in self._streams():
             stream.waitForCompletion()
 
     def restore_frame(self, buffer: Gst.Buffer):
