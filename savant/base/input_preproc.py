@@ -1,5 +1,7 @@
 """Base model input preprocessors."""
 
+from __future__ import annotations
+
 from abc import abstractmethod
 from typing import Callable, Optional
 

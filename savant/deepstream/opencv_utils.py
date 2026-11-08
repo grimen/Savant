@@ -1,5 +1,7 @@
 """Utils for working OpenCV representation of CUDA memory (cv2.cuda.GpuMat)."""
 
+from __future__ import annotations
+
 from contextlib import contextmanager
 from typing import ContextManager, Optional, Tuple, Union
 
