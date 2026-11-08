@@ -68,7 +68,9 @@ savantboost::Image* RotateBBox::CutFromFrame(Npp8u* frame, NppiSize frame_size, 
     float shift_y = -rotated_ex_rect_bbox[0][1] -
                     (rotated_ex_rect_bbox[1][1] - rotated_ex_rect_bbox[0][1]) / 2 + _height / 2 + padding_height;
 
-    nppiRotate_8u_C4R(
+    NppStreamContext npp_stream_ctx;
+    nppGetStreamContext(&npp_stream_ctx);
+    nppiRotate_8u_C4R_Ctx(
             frame,
             frame_size,
             frame_size.width * 4,
@@ -79,7 +81,8 @@ savantboost::Image* RotateBBox::CutFromFrame(Npp8u* frame, NppiSize frame_size, 
             _angle,
             shift_x,
             shift_y,
-            NPPI_INTER_LINEAR
+            NPPI_INTER_LINEAR,
+            npp_stream_ctx
     );
     cudaDeviceSynchronize();
     return object_image;
