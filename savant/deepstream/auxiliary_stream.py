@@ -4,7 +4,6 @@ from typing import Any, Deque, Dict, Optional, Tuple
 
 import pyds
 from pygstsavantframemeta import gst_buffer_add_savant_frame_meta
-from pynvbufsurfacegenerator import NvBufSurfaceGenerator
 from savant_rs.pipeline2 import VideoPipeline
 from savant_rs.primitives import VideoFrame, VideoFrameContent
 from savant_rs.py.api.constants import DEFAULT_TIME_BASE
@@ -90,6 +89,8 @@ class AuxiliaryStreamInternal:
             )
         )
         self._memory_type = int(pyds.NVBUF_MEM_DEFAULT)
+        from pynvbufsurfacegenerator import NvBufSurfaceGenerator
+
         self._surface_generator = NvBufSurfaceGenerator(
             self._caps,
             0,  # TODO: get gpu_id

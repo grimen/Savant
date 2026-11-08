@@ -6,7 +6,8 @@ from configparser import ConfigParser
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, MutableSequence, Optional, Union
+from collections.abc import Sequence
+from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 
 from omegaconf import DictConfig
 
@@ -52,7 +53,9 @@ class NvInferConfig:
 
         def _to_str(dic):
             for key, val in dic.items():
-                if isinstance(val, MutableSequence):
+                # Tuples are not MutableSequence. DeepStream 9.1 rejects
+                # infer-dims written as "(3, 544, 960)".
+                if isinstance(val, Sequence) and not isinstance(val, (str, bytes)):
                     dic[key] = ';'.join(map(str, val))
                 elif isinstance(val, Mapping):
                     dic[key] = _to_str(val)
