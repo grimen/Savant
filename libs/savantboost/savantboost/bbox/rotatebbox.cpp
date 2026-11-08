@@ -11,6 +11,7 @@
 
 #include "rotatebbox.h"
 #include <cmath>
+#include <cuda_runtime.h>
 #include <npp.h>
 
 
@@ -68,8 +69,18 @@ savantboost::Image* RotateBBox::CutFromFrame(Npp8u* frame, NppiSize frame_size, 
     float shift_y = -rotated_ex_rect_bbox[0][1] -
                     (rotated_ex_rect_bbox[1][1] - rotated_ex_rect_bbox[0][1]) / 2 + _height / 2 + padding_height;
 
-    NppStreamContext npp_stream_ctx;
-    nppGetStreamContext(&npp_stream_ctx);
+    NppStreamContext npp_stream_ctx{};
+    cudaGetDevice(&npp_stream_ctx.nCudaDeviceId);
+    cudaDeviceProp device_prop{};
+    cudaGetDeviceProperties(&device_prop, npp_stream_ctx.nCudaDeviceId);
+    npp_stream_ctx.hStream = 0;
+    npp_stream_ctx.nMultiProcessorCount = device_prop.multiProcessorCount;
+    npp_stream_ctx.nMaxThreadsPerMultiProcessor = device_prop.maxThreadsPerMultiProcessor;
+    npp_stream_ctx.nMaxThreadsPerBlock = device_prop.maxThreadsPerBlock;
+    npp_stream_ctx.nSharedMemPerBlock = device_prop.sharedMemPerBlock;
+    npp_stream_ctx.nCudaDevAttrComputeCapabilityMajor = device_prop.major;
+    npp_stream_ctx.nCudaDevAttrComputeCapabilityMinor = device_prop.minor;
+    cudaStreamGetFlags(npp_stream_ctx.hStream, &npp_stream_ctx.nStreamFlags);
     nppiRotate_8u_C4R_Ctx(
             frame,
             frame_size,
