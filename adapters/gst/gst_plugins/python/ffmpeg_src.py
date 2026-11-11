@@ -263,7 +263,16 @@ class FFmpegSrc(LoggerMixin, GstBase.BaseSrc):
                 ret = self.on_frame_params_change(frame_params)
                 if ret != Gst.FlowReturn.OK:
                     return ret
-            buffer: Gst.Buffer = Gst.Buffer.new_wrapped(frame.payload_as_bytes())
+            payload = frame.payload_as_bytes()
+            if not payload:
+                self.logger.warning(
+                    'Empty frame payload received. Skipping. PTS: %s, DTS: %s, codec: %s',
+                    frame.pts,
+                    frame.dts,
+                    frame.codec,
+                )
+                continue
+            buffer: Gst.Buffer = Gst.Buffer.new_wrapped(payload)
             tb_num, tb_denum = frame.time_base
             buffer.pts = pts * tb_num * Gst.SECOND // tb_denum
             buffer.dts = dts * tb_num * Gst.SECOND // tb_denum
