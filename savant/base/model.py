@@ -134,7 +134,7 @@ class ModelInput:
     """Pixel scaling/normalization factor.
     """
 
-    offsets: Tuple[float, float, float] = (0.0, 0.0, 0.0)
+    offsets: Tuple[float, ...] = (0.0, 0.0, 0.0)
     """Array of mean values of color components to be subtracted from each pixel.
 
     Example
