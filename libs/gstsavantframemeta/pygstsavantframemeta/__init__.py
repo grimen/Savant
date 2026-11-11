@@ -1,6 +1,7 @@
 from typing import Optional
 
 import gi
+import pyds
 from savant_rs.pipeline2 import VideoPipeline
 
 from . import pygstsavantframemeta
@@ -89,7 +90,10 @@ def nvds_frame_meta_get_nvds_savant_frame_meta(
     :param frame_meta: NvDs frame metadata.
     :return: Metadata.
     """
-    return pygstsavantframemeta.nvds_frame_meta_get_nvds_savant_frame_meta(frame_meta)
+    # mainstream patch #911: pyds_lite exposes pointers through get_ptr().
+    return pygstsavantframemeta.nvds_frame_meta_get_nvds_savant_frame_meta(
+        pyds.get_ptr(frame_meta)
+    )
 
 
 def add_convert_savant_frame_meta_pad_probe(pad: Gst.Pad, to_nvds: bool):

@@ -38,7 +38,8 @@ class GstPipeline:  # pylint: disable=too-many-instance-attributes
         self._buffer_processor = self._build_buffer_processor(self._queue)
 
         # init pipeline
-        self._pipeline: Gst.Pipeline = Gst.Pipeline(name)
+        # mainstream patch #911: current PyGObject uses the named constructor.
+        self._pipeline: Gst.Pipeline = Gst.Pipeline.new(name)
 
         # last added element - to link elements properly
         # `last_element.link(new_element)`

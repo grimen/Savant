@@ -73,10 +73,12 @@ PYBIND11_MODULE(pygstsavantframemeta, m) {
         },
         py::return_value_policy::reference);
 
+    // mainstream patch #911: accept pyds_lite's public integer pointer too.
     m.def(
         "nvds_frame_meta_get_nvds_savant_frame_meta",
-        [](NvDsFrameMeta *frame_meta) {
-            return nvds_frame_meta_get_nvds_savant_frame_meta(frame_meta);
+        [](size_t frame_meta) {
+            return nvds_frame_meta_get_nvds_savant_frame_meta(
+                reinterpret_cast<NvDsFrameMeta *>(frame_meta));
         },
         py::return_value_policy::reference);
 
