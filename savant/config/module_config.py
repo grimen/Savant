@@ -1,5 +1,6 @@
 """Module configuration."""
 
+import os
 import re
 from pathlib import Path
 from typing import IO, Any, Callable, Iterable, Optional, Tuple, Type, Union
@@ -532,6 +533,11 @@ class ModuleConfig(metaclass=SingletonMeta):
         module_cfg = merge_configs([module_cfg], self._default_cfg)
 
         module_cfg = OmegaConf.unsafe_merge(OmegaConf.structured(Module), module_cfg)
+
+        # mainstream change (#911): allow service-address overrides without app edits.
+        etcd_hosts = os.environ.get('MAINSTREAM_ETCD_HOSTS')
+        if etcd_hosts and 'etcd' in module_cfg.parameters:
+            module_cfg.parameters.etcd.hosts = etcd_hosts.split(',')
 
         init_param_storage(module_cfg)
         OmegaConf.resolve(module_cfg)  # to resolve parameters for pipeline elements
