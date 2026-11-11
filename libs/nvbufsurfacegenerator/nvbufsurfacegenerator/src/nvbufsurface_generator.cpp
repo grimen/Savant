@@ -88,7 +88,7 @@ void NvBufSurfaceGenerator::create_surface(GstBuffer *buffer_dest) {
     }
     gst_buffer_remove_all_memory(buffer_dest);
     GstMemory *memory = gst_memory_new_wrapped(
-        GST_MEMORY_FLAG_NONE, surface, sizeof(NvBufSurface), 0, sizeof(NvBufSurface), surface,
+        static_cast<GstMemoryFlags>(0), surface, sizeof(NvBufSurface), 0, sizeof(NvBufSurface), surface,
         reinterpret_cast<GDestroyNotify>(NvBufSurfaceDestroy));
     gst_buffer_append_memory(buffer_dest, memory);
     GST_DEBUG("Buffer %p copied into buffer %p", buffer, buffer_dest);
