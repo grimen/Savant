@@ -91,5 +91,7 @@ void NvBufSurfaceGenerator::create_surface(GstBuffer *buffer_dest) {
         static_cast<GstMemoryFlags>(0), surface, sizeof(NvBufSurface), 0, sizeof(NvBufSurface), surface,
         reinterpret_cast<GDestroyNotify>(NvBufSurfaceDestroy));
     gst_buffer_append_memory(buffer_dest, memory);
+    gst_mini_object_set_qdata(GST_MINI_OBJECT_CAST(buffer_dest),
+                              g_quark_from_static_string("nvbufsurface"), surface, NULL);
     GST_DEBUG("Buffer %p copied into buffer %p", buffer, buffer_dest);
 }
