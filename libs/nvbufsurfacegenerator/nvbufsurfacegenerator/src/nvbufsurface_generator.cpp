@@ -62,8 +62,34 @@ void NvBufSurfaceGenerator::create_surface(GstBuffer *buffer_dest) {
         throw std::runtime_error("Failed to acquire buffer from pool");
     }
 
-    gst_buffer_copy_into(buffer_dest, buffer, GST_BUFFER_COPY_ALL, 0, -1);
-    GST_DEBUG("Buffer %p copied into buffer %p", buffer, buffer_dest);
+    // mainstream patch #911: allocate independent storage for resized output.
+    GstMapInfo map;
+    if (!gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+        gst_buffer_unref(buffer);
+        gst_buffer_pool_release_buffer(buffer_pool, buffer);
+        throw std::runtime_error("Failed to map pooled surface");
+    }
+    auto *source = reinterpret_cast<NvBufSurface *>(map.data);
+    NvBufSurfaceCreateParams create_params = {};
+    create_params.gpuId = source->gpuId;
+    create_params.memType = source->memType;
+    create_params.layout = source->surfaceList[0].layout;
+    create_params.colorFormat = source->surfaceList[0].colorFormat;
+    create_params.width = source->surfaceList[0].width;
+    create_params.height = source->surfaceList[0].height;
+    uint32_t batch_size = source->batchSize;
+    gst_buffer_unmap(buffer, &map);
     gst_buffer_unref(buffer);
     gst_buffer_pool_release_buffer(buffer_pool, buffer);
+
+    NvBufSurface *surface = nullptr;
+    if (NvBufSurfaceCreate(&surface, batch_size, &create_params) != 0) {
+        throw std::runtime_error("Failed to allocate independent surface");
+    }
+    gst_buffer_remove_all_memory(buffer_dest);
+    GstMemory *memory = gst_memory_new_wrapped(
+        0, surface, sizeof(NvBufSurface), 0, sizeof(NvBufSurface), surface,
+        reinterpret_cast<GDestroyNotify>(NvBufSurfaceDestroy));
+    gst_buffer_append_memory(buffer_dest, memory);
+    GST_DEBUG("Buffer %p copied into buffer %p", buffer, buffer_dest);
 }
