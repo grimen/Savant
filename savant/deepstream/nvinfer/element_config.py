@@ -594,6 +594,11 @@ def nvtracker_element_configurator(
         )
 
     ll_lib_file = element_config.properties.get('ll-lib-file')
+    sample_root = os.environ.get('MAINSTREAM_SAMPLE_ROOT')
+    nvidia_prefix = '/opt/nvidia/deepstream/deepstream/'
+    if sample_root and ll_lib_file and ll_lib_file.startswith(nvidia_prefix):
+        ll_lib_file = os.path.join(sample_root, ll_lib_file[len(nvidia_prefix) :])
+        element_config.properties['ll-lib-file'] = ll_lib_file
     if ll_lib_file is not None and not os.path.exists(ll_lib_file):
         raise NvTrackerConfigException(
             f'File not found when loading low-level library for nvtracker: '
