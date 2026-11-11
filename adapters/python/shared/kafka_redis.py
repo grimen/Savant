@@ -240,7 +240,8 @@ def run_kafka_redis_adapter(
     # To gracefully shutdown the adapter on SIGTERM (raise KeyboardInterrupt)
     signal.signal(signal.SIGTERM, signal.getsignal(signal.SIGINT))
     source = adapter_class(config_class())
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
         loop.run_until_complete(source.run())
     except KeyboardInterrupt:
