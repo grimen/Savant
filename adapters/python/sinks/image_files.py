@@ -213,7 +213,10 @@ def main():
     except KeyboardInterrupt:
         logger.info('Interrupted')
     finally:
-        source.terminate()
+        try:
+            source.terminate()
+        except KeyboardInterrupt:
+            pass
         image_sink.terminate()
 
 
