@@ -6,9 +6,31 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
 import numpy as np
+from savant_rs.primitives.geometry import BBox
 
 from savant.base.converter import BaseAttributeModelOutputConverter
+from savant.base.input_preproc import BasePreprocessObjectMeta
 from savant.base.model import AttributeModel
+from savant.meta.object import ObjectMeta
+
+
+class PlateCropPreprocessObjectMeta(BasePreprocessObjectMeta):
+    """Remove plate-border noise before OCR."""
+
+    def __init__(self, inset: float = 0.1, **kwargs):
+        super().__init__(**kwargs)
+        self.inset = inset
+
+    def __call__(self, object_meta: ObjectMeta) -> BBox:
+        bbox = object_meta.bbox
+        dx = bbox.width * self.inset
+        dy = bbox.height * self.inset
+        return BBox.ltrb(
+            bbox.left + dx,
+            bbox.top + dy,
+            bbox.right - dx,
+            bbox.bottom - dy,
+        )
 
 
 class OCRNetVITOutputConverter(BaseAttributeModelOutputConverter):

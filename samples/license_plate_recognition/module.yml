@@ -207,6 +207,11 @@ pipeline:
         batch_size: 1
         input:
           object: lpd.lpd
+          preprocess_object_meta:
+            module: samples.license_plate_recognition.ocrnet_converter
+            class_name: PlateCropPreprocessObjectMeta
+            kwargs:
+              inset: 0.1
           shape: [1, 64, 200]
           color_format: gray
           scale_factor: 0.00784313
