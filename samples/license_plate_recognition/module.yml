@@ -198,6 +198,8 @@ pipeline:
             endpoint: https://eu-central-1.linodeobjects.com
         format: onnx
         model_file: ocrnet-vit.onnx
+        # mainstream change (#911): ROCm FP16 emits out-of-vocabulary token IDs.
+        precision: fp32
         batch_size: 16
         input:
           object: lpd.lpd
