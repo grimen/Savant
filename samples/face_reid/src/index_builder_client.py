@@ -103,9 +103,11 @@ def main(args):
 
     person_names = []
     results_count = 0
+    received_count = 0
     for result in sink:
         if result.eos:
             continue
+        received_count += 1
 
         # get location tag from metadata
         loc_attr = result.frame_meta.get_attribute('default', 'location')
@@ -161,8 +163,9 @@ def main(args):
 
         results_count += 1
 
-        # don't wait for sink timeout if all images were processed
-        if results_count == len(img_paths):
+        # don't wait for sink timeout when every image has a result, including
+        # images where the detector legitimately found no face
+        if received_count == len(img_paths):
             logger.info('All images processed, stopping the module.')
             break
 
