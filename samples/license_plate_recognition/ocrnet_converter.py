@@ -51,6 +51,10 @@ class OCRNetVITOutputConverter(BaseAttributeModelOutputConverter):
         probs = []
 
         for i in range(0, output_len):
+            # mainstream change (#911): reject out-of-vocabulary model output
+            # instead of terminating the pipeline before a valid plate arrives.
+            if output_id[i] < 0 or output_id[i] >= len(character_list):
+                return None
             char = character_list[output_id[i]]
             if char != '[s]':
                 text += char
