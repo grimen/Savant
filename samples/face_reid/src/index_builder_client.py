@@ -59,7 +59,8 @@ def main(args):
     # Build the source
     source = SourceBuilder().with_socket(args.zmq_src_socket).build()
     # Build the sink
-    sink = SinkBuilder().with_socket(args.zmq_sink_socket).with_idle_timeout(10).build()
+    idle_timeout = int(os.environ.get('INDEX_IDLE_TIMEOUT', '10'))
+    sink = SinkBuilder().with_socket(args.zmq_sink_socket).with_idle_timeout(idle_timeout).build()
 
     img_paths = list(sorted(pathlib.Path(args.gallery_dir).glob('*.jpeg')))
     for img_path in img_paths:

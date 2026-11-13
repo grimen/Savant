@@ -475,8 +475,13 @@ class MediaFilesSrcBin(LoggerMixin, Gst.Bin):
         self.src_pad.push_event(tag_event)
 
     def set_frame_duration(self, pad: Gst.Pad, info: Gst.PadProbeInfo):
-        buffer: Gst.Buffer = info.get_buffer()
+        source: Gst.Buffer = info.get_buffer()
+        with source.map(Gst.MapFlags.READ) as map_info:
+            buffer = Gst.Buffer.new_wrapped(bytes(map_info.data))
+        buffer.pts = source.pts
+        buffer.dts = source.dts
         buffer.duration = self.frame_duration
+        info.buffer = buffer
         return Gst.PadProbeReturn.OK
 
     def list_demuxer_factories(self):

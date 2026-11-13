@@ -18,7 +18,7 @@ _attribute_value_to_python = {
     AttributeValueType.BBoxList: lambda x: x.as_bboxes(),
     AttributeValueType.Boolean: lambda x: x.as_boolean(),
     AttributeValueType.BooleanList: lambda x: x.as_booleans(),
-    AttributeValueType.Bytes: lambda x: x.as_bytes(),
+    AttributeValueType.Bytes: lambda x: list(x.as_bytes()[1]),
     AttributeValueType.Float: lambda x: x.as_float(),
     AttributeValueType.FloatList: lambda x: x.as_floats(),
     AttributeValueType.Integer: lambda x: x.as_integer(),

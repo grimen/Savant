@@ -2,6 +2,7 @@
 
 from savant_rs.py.client.runner.sink import AsyncSinkRunner as SavantRsAsyncSinkRunner
 from savant_rs.py.client.runner.sink import SinkResult
+from savant_rs.py.client.runner.sink import SinkRunner as SavantRsSinkRunner
 
 
 class _ReceivedMessage:
@@ -15,7 +16,7 @@ class _ReceivedMessage:
         pass
 
 
-class AsyncSinkRunner(SavantRsAsyncSinkRunner):
+class _MessageCompatibility:
     def _handle_message(self, zmq_message):
         if not hasattr(zmq_message.message, 'validate_seq_id'):
             message = _ReceivedMessage(zmq_message.message)
@@ -23,4 +24,12 @@ class AsyncSinkRunner(SavantRsAsyncSinkRunner):
         return super()._handle_message(zmq_message)
 
 
-__all__ = ['AsyncSinkRunner', 'SinkResult']
+class SinkRunner(_MessageCompatibility, SavantRsSinkRunner):
+    pass
+
+
+class AsyncSinkRunner(_MessageCompatibility, SavantRsAsyncSinkRunner):
+    pass
+
+
+__all__ = ['AsyncSinkRunner', 'SinkResult', 'SinkRunner']
