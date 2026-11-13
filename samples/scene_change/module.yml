@@ -55,8 +55,10 @@ pipeline:
         input:
           object: roi_injector.roi
           shape: [3, 224, 224]
-          scale_factor: 0.01735207357279195
-          offsets: [123.675, 116.28, 103.53]
+          # mainstream change (#911): this model collapses with the published
+          # mean/std transform; [0,1] input preserves scene and occlusion changes.
+          scale_factor: 0.00392156862745098
+          offsets: [0.0, 0.0, 0.0]
           maintain_aspect_ratio: true
         output:
           layer_names: [output]
