@@ -143,7 +143,10 @@ pipeline:
           parameters:
             endpoint: https://eu-central-1.linodeobjects.com
         model_file: LPDNet_usa_pruned_tao5.onnx
-        batch_size: 16
+        # mainstream change (#911): ROCm FP16 can emit unbounded sigmoid coverage.
+        precision: fp32
+        # Secondary inference runs one crop per call on the portable backend.
+        batch_size: 1
         input:
           object: ${parameters.vehicle_roi.element_name}.${parameters.vehicle_roi.label}
           layer_name: input_1:0
@@ -200,7 +203,8 @@ pipeline:
         model_file: ocrnet-vit.onnx
         # mainstream change (#911): ROCm FP16 emits out-of-vocabulary token IDs.
         precision: fp32
-        batch_size: 16
+        # Secondary inference runs one crop per call on the portable backend.
+        batch_size: 1
         input:
           object: lpd.lpd
           shape: [1, 64, 200]
