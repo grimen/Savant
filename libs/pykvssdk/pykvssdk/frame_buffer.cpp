@@ -58,7 +58,7 @@ void FrameBuffer::clear() {
     LOG_PYBIND_DEBUG("Clearing frame buffer.");
     for (auto &kv: frames) {
         for (auto frame: kv.second) {
-            delete[] frame->frame->frameData;
+            // mainstream issue #894: VideoFrame releases frameData in its destructor.
             delete frame;
         }
     }

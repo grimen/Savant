@@ -1,3 +1,6 @@
+// mainstream issue #894: expose the SDK control-plane endpoint for local KVS.
+#include <cstdlib>
+
 #include "KinesisVideoProducer.h"
 #include "KinesisVideoStream.h"
 #include "client_callback_provider.h"
@@ -57,6 +60,7 @@ KvsWrapper::KvsWrapper(
     );
     std::unique_ptr<video::CredentialProvider> credential_provider(
         new video::StaticCredentialProvider(credentials));
+    const char *control_plane_uri = std::getenv("CONTROL_PLANE_URI");
     producer = video::KinesisVideoProducer::createSync(
         std::move(device_info_provider),
         std::move(client_callback_provider),
@@ -64,7 +68,8 @@ KvsWrapper::KvsWrapper(
         std::move(credential_provider),
 //        API_CALL_CACHE_TYPE_ALL,
         API_CALL_CACHE_TYPE_NONE,
-        region
+        region,
+        control_plane_uri ? control_plane_uri : ""
     );
 
     std::unique_ptr<video::StreamDefinition> stream_definition(
